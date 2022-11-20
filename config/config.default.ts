@@ -6,9 +6,13 @@ export default (appInfo: EggAppInfo) => {
   // override config from framework / plugin
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1668907708821_2538';
-
+  config.security = {
+    csrf: {
+      headerName: 'x-csrf-token', // 自定义请求头
+    },
+  };
   // add your egg config in here
-  config.middleware = ['errorHandler'];
+  config.middleware = [ 'errorHandler' ];
   config.errorHandler = { match: '/api' };
   config.mysql = {
     client: {

@@ -4,24 +4,29 @@ import { Service } from 'egg';
  * Equipemnts Service
  */
 export default class Equipments extends Service {
+
+  /**
+   * search equipment
+   */
+  public async searchList(body: any) {
+    // let result: EggMySQLSelectResult;
+    const { searchContent, property, department } = body;
+    this.app.logger.info(`正在搜索设备名:${searchContent}, 属性：${property}, 部门: ${department} 的设备列表`);
+    const result: EggMySQLSelectResult = await this.app.mysql.select('equipment', {
+      where: {
+        equipment_name: searchContent,
+        // department_name: department,
+      },
+    });
+    return result;
+  }
+
   /**
    * get equipment list
    */
-  public async getList(query: any) {
-    let result: EggMySQLSelectResult;
-    const { key } = query;
-    if (key) {
-      this.app.logger.info(`正在获取设备名为${key}的设备列表`);
-      result = await this.app.mysql.select('equipment', {
-        where: {
-          equipment_name: key,
-        },
-      });
-    } else {
-      this.app.logger.info('正在获取设备列表');
-      result = await this.app.mysql.select('equipment');
-    }
-    return result;
+  public async getList() {
+    this.app.logger.info('正在获取设备列表');
+    return await this.app.mysql.select('equipment');
   }
 
   /**

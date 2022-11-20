@@ -3,10 +3,20 @@ import { Controller } from 'egg';
 // 定义创建接口的请求参数规则
 
 export default class EquipmentController extends Controller {
-  public async index() {
+
+  public async search() {
     const { ctx } = this;
     const { request } = ctx;
-    const result = await ctx.service.equipments.getList(request.query);
+    const result = await ctx.service.equipments.searchList(request.body);
+    ctx.body = {
+      equipmentList: result,
+    };
+    ctx.status = 201;
+  }
+
+  public async index() {
+    const { ctx } = this;
+    const result = await ctx.service.equipments.getList();
     ctx.body = {
       equipmentList: result,
     };
