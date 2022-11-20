@@ -5,7 +5,8 @@ import { Controller } from 'egg';
 export default class EquipmentController extends Controller {
   public async index() {
     const { ctx } = this;
-    const result = await ctx.service.equipments.getList();
+    const { request } = ctx;
+    const result = await ctx.service.equipments.getList(request.query);
     ctx.body = {
       equipmentList: result,
     };
@@ -14,9 +15,10 @@ export default class EquipmentController extends Controller {
 
   public async show() {
     const { ctx } = this;
-    const result = await ctx.service.equipments.getDetail('123123123');
+    const { params } = ctx;
+    const equipmentInfo = await ctx.service.equipments.getDetail(params);
     ctx.body = {
-      equipment: result,
+      equipmentInfo,
     };
     ctx.status = 201;
   }

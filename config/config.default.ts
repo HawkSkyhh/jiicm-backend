@@ -8,16 +8,9 @@ export default (appInfo: EggAppInfo) => {
   config.keys = appInfo.name + '_1668907708821_2538';
 
   // add your egg config in here
-  config.middleware = [ 'errorHandler' ];
+  config.middleware = ['errorHandler'];
   config.errorHandler = { match: '/api' };
-
-  // add your special config in here
-  const bizConfig = {
-    sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
-  };
-
-  // mysql config
-  const mysqlConfig = {
+  config.mysql = {
     client: {
       host: 'localhost',
       port: '3306',
@@ -29,10 +22,17 @@ export default (appInfo: EggAppInfo) => {
     agent: false,
   };
 
+  // add your special config in here
+  const bizConfig = {
+    sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
+  };
+
+  // mysql config
+
+
   // the return config will combines to EggAppConfig
   return {
     ...config,
     ...bizConfig,
-    ...mysqlConfig,
   };
 };
