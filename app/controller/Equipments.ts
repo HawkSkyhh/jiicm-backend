@@ -4,6 +4,17 @@ import { Controller } from 'egg';
 
 export default class EquipmentController extends Controller {
 
+  public async uploadPic() {
+    const { ctx } = this;
+    const { request } = ctx;
+    const { files, query } = request;
+    const result = await ctx.service.equipments.uploadPic(files, query.id);
+    ctx.body = {
+      equipmentList: result,
+    };
+    ctx.status = 201;
+  }
+
   public async search() {
     const { ctx } = this;
     const { request } = ctx;

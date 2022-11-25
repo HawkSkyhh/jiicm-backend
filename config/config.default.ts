@@ -12,7 +12,7 @@ export default (appInfo: EggAppInfo) => {
     },
   };
   // add your egg config in here
-  config.middleware = [ 'errorHandler' ];
+  config.middleware = ['errorHandler'];
   config.errorHandler = { match: '/api' };
   config.mysql = {
     client: {
@@ -20,10 +20,14 @@ export default (appInfo: EggAppInfo) => {
       port: '3306',
       user: 'root',
       password: 'jiicm@1024',
-      database: 'jiicm',
+      database: 'jiicma',
     },
     app: true,
     agent: false,
+  };
+  config.multipart = {
+    mode: 'file',
+    fileExtensions: [ '.md' ],
   };
 
   // add your special config in here

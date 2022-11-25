@@ -1,9 +1,27 @@
 import { Service } from 'egg';
+import { writeFile } from 'fs';
 
 /**
  * Equipemnts Service
  */
 export default class Equipments extends Service {
+
+  /**
+   * upload pic in equipment
+   */
+  public async uploadPic(files: any, id: string) {
+    console.log(id);
+    const basePath = 'E:/thawingx/tempData/';
+    for (const file of files) {
+      const { filename, filepath } = file;
+      const target = basePath + filename;
+      writeFile(target, filepath, { flag: "a" }, (err: any) => { if (err) throw err; });
+      await this.app.mysql.insert('equipment_pic', {
+        id,
+        pic_path: target,
+      });
+    }
+  }
 
   /**
    * search equipment
@@ -33,13 +51,13 @@ export default class Equipments extends Service {
    * get equipment detail by id
    * @param id equipment id
    */
-  public async getDetail(id: any) {
+  public async getDetail(name: any) {
     let result: EggMySQLSelectResult;
-    if (id) {
-      this.app.logger.info(`正在获取设备id为${id}的设备信息`);
+    if (name) {
+      this.app.logger.info(`正在获取设备id为${name}的设备信息`);
       result = await this.app.mysql.select('equipment', {
         where: {
-          id,
+          name,
         },
         limit: 1,
       });
