@@ -8,7 +8,7 @@ export default class EquipmentController extends Controller {
     const { ctx } = this;
     const { request } = ctx;
     const { files, query } = request;
-    const result = await ctx.service.equipments.uploadPic(files, query.id);
+    const result = await ctx.service.equipments.uploadPic(files, query.id, query.isCover);
     ctx.body = {
       equipmentList: result,
     };

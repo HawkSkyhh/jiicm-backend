@@ -1,5 +1,7 @@
+
 import { Service } from 'egg';
-import { writeFile } from 'fs';
+import { copyFile } from 'tutils/fileSystemSync';
+
 
 /**
  * Equipemnts Service
@@ -9,17 +11,23 @@ export default class Equipments extends Service {
   /**
    * upload pic in equipment
    */
-  public async uploadPic(files: any, id: string) {
-    console.log(id);
+  public async uploadPic(files: any, id: string, isCover: string) {
+
     const basePath = 'E:/thawingx/tempData/';
     for (const file of files) {
       const { filename, filepath } = file;
       const target = basePath + filename;
-      writeFile(target, filepath, { flag: "a" }, (err: any) => { if (err) throw err; });
-      await this.app.mysql.insert('equipment_pic', {
-        id,
-        pic_path: target,
-      });
+      this.app.logger.info(`正在上传文件 '${filename}' 到 '${target}' `);
+      copyFile(filepath, target, true);
+      if (isCover === 'true') {
+        await this.app.mysql.query(`update equipment set avatar_path = '${target}' where id = '${id}'`);
+      } else {
+        await this.app.mysql.insert('equipment_pic', {
+          id,
+          pic_path: target,
+        });
+      }
+
     }
   }
 
@@ -30,12 +38,15 @@ export default class Equipments extends Service {
     // let result: EggMySQLSelectResult;
     const { searchContent, property, department } = body;
     this.app.logger.info(`正在搜索设备名:${searchContent}, 属性：${property}, 部门: ${department} 的设备列表`);
-    const result: EggMySQLSelectResult = await this.app.mysql.select('equipment', {
-      where: {
-        equipment_name: searchContent,
-        // department_name: department,
-      },
-    });
+    let result: EggMySQLSelectResult | EggMySQLUpdateResult | EggMySQLInsertResult;
+
+    if (property === 'yard') {
+      result = await this.app.mysql.query(`select * from equipment where name like '%${searchContent}%' and department = '${department}'`);
+    } else if (property === 'item') {
+      result = await this.app.mysql.query(`select * from equipment where name like '%${searchContent}%' and department like '联创项目%'`);
+    } else {
+      result = await this.app.mysql.query(`select * from equipment where name like '%${searchContent}%'`);
+    }
     return result;
   }
 
@@ -44,7 +55,19 @@ export default class Equipments extends Service {
    */
   public async getList() {
     this.app.logger.info('正在获取设备列表');
-    return await this.app.mysql.select('equipment');
+    const result = await this.app.mysql.select('equipment');
+    result.map((item: any) => {
+      item.tables = [{
+        oid: item.oid,
+        location: item.location,
+        create_time: item.create_time,
+        alignment: item.alignment,
+        owner: item.owner,
+        standard_owner: item.standard_owner,
+      }];
+      return item;
+    });
+    return result;
   }
 
   /**
